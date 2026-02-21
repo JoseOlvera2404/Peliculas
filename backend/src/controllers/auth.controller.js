@@ -36,11 +36,53 @@ exports.registro = async (req, res) => {
 
     // 🔥 Enviar correo con Resend
     try {
+      const html = `
+      <div style="font-family: Arial, sans-serif; background-color: #f4f6f8; padding: 40px;">
+        <div style="max-width: 600px; margin: auto; background: white; border-radius: 10px; overflow: hidden;">
+          
+          <div style="background: #111827; padding: 20px; text-align: center;">
+            <h1 style="color: #ffffff; margin: 0;">🎬 Películas App</h1>
+          </div>
+
+          <div style="padding: 30px;">
+            <h2 style="color: #111827;">¡Bienvenido ${nombre}!</h2>
+            <p style="color: #4b5563; font-size: 16px;">
+              Tu cuenta ha sido creada exitosamente.
+            </p>
+
+            <div style="margin: 20px 0; padding: 15px; background: #f3f4f6; border-radius: 8px;">
+              <p style="margin: 0; font-size: 14px; color: #6b7280;">Tu contraseña temporal es:</p>
+              <p style="margin: 5px 0; font-size: 18px; font-weight: bold; color: #111827;">
+                ${passwordGenerado}
+              </p>
+            </div>
+
+            <p style="font-size: 14px; color: #6b7280;">
+              Te recomendamos cambiarla después de iniciar sesión.
+            </p>
+
+            <div style="text-align: center; margin-top: 30px;">
+              <a href="https://api.joseolvera.com"
+                style="background: #111827; color: white; padding: 12px 20px; text-decoration: none; border-radius: 6px;">
+                Iniciar sesión
+              </a>
+            </div>
+          </div>
+
+          <div style="background: #f9fafb; padding: 15px; text-align: center; font-size: 12px; color: #9ca3af;">
+            © 2026 Películas App — Todos los derechos reservados
+          </div>
+
+        </div>
+      </div>
+      `;
+
       await enviarCorreo(
         correo,
-        'Tu cuenta fue creada',
-        `Tu contraseña es: ${passwordGenerado}`
+        '🎬 Bienvenido a Películas App',
+        html
       );
+
     } catch (errorCorreo) {
       console.error("ERROR CORREO REGISTRO:", errorCorreo);
     }
