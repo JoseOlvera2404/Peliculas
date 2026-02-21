@@ -36,6 +36,8 @@ exports.registro = async (req, res) => {
 
     // 🔥 Intentar enviar correo sin romper el flujo
     try {
+      console.log("Intentando enviar correo a:", correo);
+      console.log("EMAIL_USER:", process.env.EMAIL_USER);
       await transporter.sendMail({
         from: process.env.EMAIL_USER,
         to: correo,
