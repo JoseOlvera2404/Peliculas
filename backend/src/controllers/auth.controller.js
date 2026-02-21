@@ -1,7 +1,7 @@
 const db = require('../config/db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const transporter = require('../services/email.service');
+const enviarCorreo = require('../services/email.service');
 
 function generarPassword() {
   return Math.random().toString(36).slice(-8);
@@ -34,18 +34,15 @@ exports.registro = async (req, res) => {
       [nombre, apellido_paterno, apellido_materno, correo, passwordHash]
     );
 
-    // 🔥 Intentar enviar correo sin romper el flujo
+    // 🔥 Enviar correo con Resend
     try {
-      console.log("Intentando enviar correo a:", correo);
-      console.log("EMAIL_USER:", process.env.EMAIL_USER);
-      await transporter.sendMail({
-        from: process.env.EMAIL_USER,
-        to: correo,
-        subject: 'Tu cuenta fue creada',
-        text: `Tu contraseña es: ${passwordGenerado}`
-      });
+      await enviarCorreo(
+        correo,
+        'Tu cuenta fue creada',
+        `Tu contraseña es: ${passwordGenerado}`
+      );
     } catch (errorCorreo) {
-      console.error("ERROR CORREO REGISTRO:", errorCorreo.message);
+      console.error("ERROR CORREO REGISTRO:", errorCorreo);
     }
 
     res.json({ message: 'Usuario registrado correctamente' });
@@ -134,14 +131,13 @@ exports.recuperarPassword = async (req, res) => {
     );
 
     try {
-      await transporter.sendMail({
-        from: process.env.EMAIL_USER,
-        to: correo,
-        subject: 'Recuperación de contraseña',
-        text: `Tu nueva contraseña es: ${nuevaPassword}`
-      });
+      await enviarCorreo(
+        correo,
+        'Recuperación de contraseña',
+        `Tu nueva contraseña es: ${nuevaPassword}`
+      );
     } catch (errorCorreo) {
-      console.error("ERROR CORREO RECUPERAR:", errorCorreo.message);
+      console.error("ERROR CORREO RECUPERAR:", errorCorreo);
     }
 
     res.json({ message: 'Nueva contraseña generada correctamente' });
