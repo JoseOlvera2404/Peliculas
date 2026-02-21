@@ -11,7 +11,7 @@ const options = {
     },
     servers: [
       {
-        url: RAILWAY_PUBLIC_DOMAIN
+        url: process.env.RAILWAY_SERVICE_DOMAIN
       }
     ],
     components: {
