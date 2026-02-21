@@ -11,7 +11,7 @@ const options = {
     },
     servers: [
       {
-        url: serverUrl
+        url: RAILWAY_PUBLIC_DOMAIN
       }
     ],
     components: {
