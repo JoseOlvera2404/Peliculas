@@ -1,0 +1,10 @@
+Options -Indexes
+DirectoryIndex index.php
+
+# Si estás usando XAMPP/WAMP, asegúrate que mod_rewrite está habilitado
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Redirigir errores 404 a index.php
+    ErrorDocument 404 /proyecto/index.php
+</IfModule>
