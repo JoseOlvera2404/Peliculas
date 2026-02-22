@@ -46,7 +46,7 @@ const authController = require('../controllers/auth.controller');
  *       400:
  *         description: El correo ya está registrado
  */
-router.post('/registro', authController.registro);
+router.post('/registro', authMiddleware, rolMiddleware(1), authController.registro);
 
 
 /**

@@ -9,11 +9,16 @@ function generarPassword() {
 
 
 // =============================
-// REGISTRO CLIENTE
+// REGISTRO USUARIO (SOLO ADMIN)
 // =============================
 exports.registro = async (req, res) => {
   try {
-    const { nombre, apellido_paterno, apellido_materno, correo } = req.body;
+    const { nombre, apellido_paterno, apellido_materno, correo, rol_id } = req.body;
+
+    // Validar rol permitido (1 = ADMIN, 2 = CLIENTE)
+    if (![1, 2].includes(Number(rol_id))) {
+      return res.status(400).json({ message: 'Rol inválido' });
+    }
 
     const [existe] = await db.query(
       'SELECT id FROM usuarios WHERE correo = ?',
@@ -30,56 +35,88 @@ exports.registro = async (req, res) => {
     await db.query(
       `INSERT INTO usuarios 
       (nombre, apellido_paterno, apellido_materno, correo, password, rol_id) 
-      VALUES (?, ?, ?, ?, ?, 2)`,
-      [nombre, apellido_paterno, apellido_materno, correo, passwordHash]
+      VALUES (?, ?, ?, ?, ?, ?)`,
+      [nombre, apellido_paterno, apellido_materno, correo, passwordHash, rol_id]
     );
 
-    // 🔥 Enviar correo con Resend
+    // 🔥 Enviar correo profesional
     try {
+
+      const rolTexto = rol_id == 1 ? "Administrador" : "Cliente";
+
       const html = `
-      <div style="font-family: Arial, sans-serif; background-color: #f4f6f8; padding: 40px;">
-        <div style="max-width: 600px; margin: auto; background: white; border-radius: 10px; overflow: hidden;">
-          
-          <div style="background: #111827; padding: 20px; text-align: center;">
-            <h1 style="color: #ffffff; margin: 0;">🎬 Películas App</h1>
-          </div>
+      <div style="margin:0;padding:0;background:#f1f5f9;font-family:Arial,sans-serif;">
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td align="center" style="padding:40px 20px;">
+              
+              <table width="600" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 8px 25px rgba(0,0,0,0.08);">
+                
+                <!-- Header -->
+                <tr>
+                  <td style="background:#111827;padding:25px;text-align:center;">
+                    <h1 style="color:#ffffff;margin:0;font-size:24px;">
+                      🎬 Películas App
+                    </h1>
+                  </td>
+                </tr>
 
-          <div style="padding: 30px;">
-            <h2 style="color: #111827;">¡Bienvenido ${nombre}!</h2>
-            <p style="color: #4b5563; font-size: 16px;">
-              Tu cuenta ha sido creada exitosamente.
-            </p>
+                <!-- Body -->
+                <tr>
+                  <td style="padding:35px;">
+                    <h2 style="color:#111827;margin-top:0;">
+                      Hola ${nombre},
+                    </h2>
 
-            <div style="margin: 20px 0; padding: 15px; background: #f3f4f6; border-radius: 8px;">
-              <p style="margin: 0; font-size: 14px; color: #6b7280;">Tu contraseña temporal es:</p>
-              <p style="margin: 5px 0; font-size: 18px; font-weight: bold; color: #111827;">
-                ${passwordGenerado}
-              </p>
-            </div>
+                    <p style="color:#4b5563;font-size:16px;line-height:1.6;">
+                      Tu cuenta fue creada exitosamente con el rol de:
+                      <strong style="color:#111827;">${rolTexto}</strong>
+                    </p>
 
-            <p style="font-size: 14px; color: #6b7280;">
-              Te recomendamos cambiarla después de iniciar sesión.
-            </p>
+                    <div style="margin:25px 0;padding:20px;background:#f3f4f6;border-radius:8px;text-align:center;">
+                      <p style="margin:0;font-size:14px;color:#6b7280;">
+                        Tu contraseña temporal es:
+                      </p>
+                      <p style="margin:10px 0 0;font-size:20px;font-weight:bold;color:#111827;">
+                        ${passwordGenerado}
+                      </p>
+                    </div>
 
-            <div style="text-align: center; margin-top: 30px;">
-              <a href="https://api.joseolvera.com"
-                style="background: #111827; color: white; padding: 12px 20px; text-decoration: none; border-radius: 6px;">
-                Iniciar sesión
-              </a>
-            </div>
-          </div>
+                    <p style="font-size:14px;color:#6b7280;">
+                      Por seguridad, cambia tu contraseña después de iniciar sesión.
+                    </p>
 
-          <div style="background: #f9fafb; padding: 15px; text-align: center; font-size: 12px; color: #9ca3af;">
-            © 2026 Películas App — Todos los derechos reservados
-          </div>
+                    <div style="text-align:center;margin-top:30px;">
+                      <a href="https://api.joseolvera.com"
+                         style="display:inline-block;background:#111827;color:#ffffff;
+                                padding:12px 25px;border-radius:6px;
+                                text-decoration:none;font-size:15px;">
+                        Iniciar sesión
+                      </a>
+                    </div>
+                  </td>
+                </tr>
 
-        </div>
+                <!-- Footer -->
+                <tr>
+                  <td style="background:#f9fafb;padding:20px;text-align:center;
+                             font-size:12px;color:#9ca3af;">
+                    © 2026 Películas App — Sistema Administrativo<br/>
+                    Este es un mensaje automático, no respondas a este correo.
+                  </td>
+                </tr>
+
+              </table>
+
+            </td>
+          </tr>
+        </table>
       </div>
       `;
 
       await enviarCorreo(
         correo,
-        '🎬 Bienvenido a Películas App',
+        '🎬 Tu cuenta fue creada - Películas App',
         html
       );
 
@@ -97,7 +134,7 @@ exports.registro = async (req, res) => {
 
 
 // =============================
-// LOGIN
+// LOGIN SOLO ADMIN (WEB)
 // =============================
 exports.login = async (req, res) => {
   try {
@@ -118,6 +155,13 @@ exports.login = async (req, res) => {
 
     if (!passwordValido) {
       return res.status(400).json({ message: 'Contraseña incorrecta' });
+    }
+
+    // 🚨 BLOQUEAR SI NO ES ADMIN
+    if (usuario.rol_id !== 1) {
+      return res.status(403).json({
+        message: 'Acceso permitido solo para administradores'
+      });
     }
 
     const token = jwt.sign(
