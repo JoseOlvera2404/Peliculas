@@ -66,11 +66,11 @@ router.post(
 
 /**
  * @swagger
- * /api/auth/login:
+ * /api/auth/login-admin:
  *   post:
- *     summary: Iniciar sesión (Solo ADMIN para web)
+ *     summary: Iniciar sesión ADMIN (Web)
  *     tags: [Auth]
- *     description: Autentica al usuario y devuelve un JWT válido por 8 horas. Solo administradores pueden iniciar sesión en la web.
+ *     description: Autentica administradores para el sistema web. Devuelve un JWT válido por 8 horas.
  *     requestBody:
  *       required: true
  *       content:
@@ -90,6 +90,29 @@ router.post(
  *     responses:
  *       200:
  *         description: Login correcto
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Login correcto
+ *                 token:
+ *                   type: string
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                 usuario:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     nombre:
+ *                       type: string
+ *                       example: Jose
+ *                     rol:
+ *                       type: integer
+ *                       example: 1
  *       400:
  *         description: Usuario no encontrado o contraseña incorrecta
  *       403:
@@ -98,7 +121,61 @@ router.post(
 router.post('/login-admin', authController.loginAdmin);
 
 
+/**
+ * @swagger
+ * /api/auth/login-cliente:
+ *   post:
+ *     summary: Iniciar sesión CLIENTE (App Android)
+ *     tags: [Auth]
+ *     description: Autentica clientes para la aplicación móvil. Devuelve un JWT válido por 8 horas.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - correo
+ *               - password
+ *             properties:
+ *               correo:
+ *                 type: string
+ *                 example: cliente@gmail.com
+ *               password:
+ *                 type: string
+ *                 example: cliente123
+ *     responses:
+ *       200:
+ *         description: Login correcto
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Login correcto
+ *                 token:
+ *                   type: string
+ *                 usuario:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 5
+ *                     nombre:
+ *                       type: string
+ *                       example: Maria
+ *                     rol:
+ *                       type: integer
+ *                       example: 2
+ *       400:
+ *         description: Usuario no encontrado o contraseña incorrecta
+ *       403:
+ *         description: Acceso permitido solo para clientes
+ */
 router.post('/login-cliente', authController.loginCliente);
+
 
 /**
  * @swagger
