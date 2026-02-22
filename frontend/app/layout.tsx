@@ -1,31 +1,21 @@
-"use client";
+import "./globals.css";
+import type { Metadata } from "next";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+export const metadata: Metadata = {
+  title: "Películas App",
+  description: "Sistema Administrativo",
+};
 
-export default function AdminLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const router = useRouter();
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      router.push("/");
-    } else {
-      setLoading(false);
-    }
-  }, []);
-
-  if (loading) return null;
-
   return (
-    <div className="flex min-h-screen">
-      {children}
-    </div>
+    <html lang="es">
+      <body className="antialiased bg-gray-100">
+        {children}
+      </body>
+    </html>
   );
 }

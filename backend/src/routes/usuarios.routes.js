@@ -60,4 +60,8 @@ router.get(
   usuariosController.listarClientes
 );
 
+router.get('/', authMiddleware, rolMiddleware(1), usuariosController.listarUsuarios);
+router.patch('/:id/estado', authMiddleware, rolMiddleware(1), usuariosController.cambiarEstado);
+router.delete('/:id', authMiddleware, rolMiddleware(1), usuariosController.eliminarUsuario);
+
 module.exports = router;
