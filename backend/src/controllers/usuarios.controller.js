@@ -5,11 +5,13 @@ const db = require('../config/db');
 // =============================
 exports.listarClientes = async (req, res) => {
   try {
-    const [clientes] = await db.query(
-      `SELECT id, nombre, apellido_paterno, apellido_materno, correo, fecha_creacion
-       FROM usuarios
-       WHERE rol_id = 2`
-    );
+    const [clientes] = await db.query(`
+      SELECT id, nombre, apellido_paterno, apellido_materno,
+             correo, activo, fecha_creacion
+      FROM usuarios
+      WHERE rol_id = 2
+      ORDER BY id DESC
+    `);
 
     res.json(clientes);
 
