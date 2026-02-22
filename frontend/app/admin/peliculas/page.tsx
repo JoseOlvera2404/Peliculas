@@ -8,6 +8,8 @@ export default function PeliculasAdmin() {
   const [peliculas, setPeliculas] = useState([]);
   const [generos, setGeneros] = useState([]);
   const [editandoId, setEditandoId] = useState<number | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [fileName, setFileName] = useState("");
 
   const [form, setForm] = useState({
     nombre: "",
@@ -76,6 +78,8 @@ export default function PeliculasAdmin() {
       imagen: null
     });
     setEditandoId(null);
+    setPreview(null);
+    setFileName("");
   };
 
   // ================================
@@ -193,18 +197,47 @@ export default function PeliculasAdmin() {
           className="p-3 rounded border col-span-2"
         />
 
-        <input
-          type="file"
-          accept="image/*"
-          className="col-span-2"
-          onChange={async (e: any) => {
-            const file = e.target.files[0];
-            if (file) {
-              const base64 = await convertirBase64(file);
-              setForm({ ...form, imagen: base64 });
-            }
-          }}
-        />
+        <div className="col-span-2">
+          <label className="block text-sm font-medium mb-2 text-gray-700">
+            Imagen de la película
+          </label>
+
+          <label className="flex flex-col items-center justify-center w-full p-6 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-gray-500 hover:bg-gray-50 transition">
+            
+            {preview ? (
+              <>
+                <img
+                  src={preview}
+                  className="w-32 h-40 object-cover rounded mb-3 shadow"
+                />
+                {fileName && (
+                  <p className="text-xs text-gray-500 mt-2">{fileName}</p>
+                )}
+              </>
+            ) : (
+              <div className="text-center text-gray-500">
+                <p className="text-lg font-semibold">📁 Seleccionar imagen</p>
+                <p className="text-sm">PNG, JPG o WebP</p>
+              </div>
+            )}
+
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={async (e: any) => {
+                const file = e.target.files[0];
+                if (file) {
+                  const base64 = await convertirBase64(file);
+                  setForm({ ...form, imagen: base64 });
+                  setPreview(base64);
+                  
+                  setFileName(file.name);
+                }
+              }}
+            />
+          </label>
+        </div>
 
         <button className="col-span-2 bg-gray-900 text-white p-3 rounded-lg hover:bg-gray-800 transition">
           {editandoId ? "Actualizar Película" : "Crear Película"}

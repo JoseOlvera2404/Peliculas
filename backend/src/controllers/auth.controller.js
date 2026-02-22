@@ -56,7 +56,7 @@ exports.registro = async (req, res) => {
                 <tr>
                   <td style="background:#111827;padding:25px;text-align:center;">
                     <h1 style="color:#ffffff;margin:0;font-size:24px;">
-                      🎬 Películas App
+                      🎬 Cinepass
                     </h1>
                   </td>
                 </tr>
@@ -87,7 +87,7 @@ exports.registro = async (req, res) => {
                     </p>
 
                     <div style="text-align:center;margin-top:30px;">
-                      <a href="https://api.joseolvera.com"
+                      <a href="https://cinepass.joseolvera.com"
                          style="display:inline-block;background:#111827;color:#ffffff;
                                 padding:12px 25px;border-radius:6px;
                                 text-decoration:none;font-size:15px;">
@@ -101,7 +101,7 @@ exports.registro = async (req, res) => {
                 <tr>
                   <td style="background:#f9fafb;padding:20px;text-align:center;
                              font-size:12px;color:#9ca3af;">
-                    © 2026 Películas App — Sistema Administrativo<br/>
+                    © 2026 Cinepass — Sistema Administrativo<br/>
                     Este es un mensaje automático, no respondas a este correo.
                   </td>
                 </tr>
@@ -116,7 +116,7 @@ exports.registro = async (req, res) => {
 
       await enviarCorreo(
         correo,
-        '🎬 Tu cuenta fue creada - Películas App',
+        '🎬 Tu cuenta fue creada - Cinepass',
         html
       );
 
@@ -285,7 +285,7 @@ exports.recuperarPassword = async (req, res) => {
                 <tr>
                   <td style="background:#111827;padding:25px;text-align:center;">
                     <h1 style="color:#ffffff;margin:0;font-size:24px;">
-                      🎬 Películas App
+                      🎬 Cinepass
                     </h1>
                   </td>
                 </tr>
@@ -315,7 +315,7 @@ exports.recuperarPassword = async (req, res) => {
                     </p>
 
                     <div style="text-align:center;margin-top:30px;">
-                      <a href="https://api.joseolvera.com"
+                      <a href="https://cinepass.joseolvera.com"
                          style="display:inline-block;background:#111827;color:#ffffff;
                                 padding:12px 25px;border-radius:6px;
                                 text-decoration:none;font-size:15px;">
@@ -328,7 +328,7 @@ exports.recuperarPassword = async (req, res) => {
                 <tr>
                   <td style="background:#f9fafb;padding:20px;text-align:center;
                              font-size:12px;color:#9ca3af;">
-                    © 2026 Películas App — Sistema Administrativo<br/>
+                    © 2026 Cinepass — Sistema Administrativo<br/>
                     Este es un mensaje automático, no respondas a este correo.
                   </td>
                 </tr>
@@ -343,7 +343,7 @@ exports.recuperarPassword = async (req, res) => {
 
       await enviarCorreo(
         correo,
-        '🔐 Recuperación de contraseña - Películas App',
+        '🔐 Recuperación de contraseña - Cinepass',
         html
       );
 
