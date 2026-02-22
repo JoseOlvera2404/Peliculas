@@ -1,4 +1,4 @@
-const API_URL = process.env.RAILWAY_PRIVATE_DOMAIN;
+const API_URL = process.env.NEXT_PRIVATE_API_URL;
 
 export async function loginRequest(correo: string, password: string) {
   const res = await fetch(`${API_URL}/api/auth/login-admin`, {
