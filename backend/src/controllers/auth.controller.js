@@ -217,16 +217,85 @@ exports.recuperarPassword = async (req, res) => {
     );
 
     try {
+
+      const html = `
+      <div style="margin:0;padding:0;background:#f1f5f9;font-family:Arial,sans-serif;">
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td align="center" style="padding:40px 20px;">
+              
+              <table width="600" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 8px 25px rgba(0,0,0,0.08);">
+                
+                <tr>
+                  <td style="background:#111827;padding:25px;text-align:center;">
+                    <h1 style="color:#ffffff;margin:0;font-size:24px;">
+                      🎬 Películas App
+                    </h1>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding:35px;">
+                    <h2 style="color:#111827;margin-top:0;">
+                      Recuperación de contraseña
+                    </h2>
+
+                    <p style="color:#4b5563;font-size:16px;line-height:1.6;">
+                      Hola <strong>${usuario.nombre}</strong>,
+                      hemos generado una nueva contraseña temporal para tu cuenta.
+                    </p>
+
+                    <div style="margin:25px 0;padding:20px;background:#f3f4f6;border-radius:8px;text-align:center;">
+                      <p style="margin:0;font-size:14px;color:#6b7280;">
+                        Tu nueva contraseña es:
+                      </p>
+                      <p style="margin:10px 0 0;font-size:20px;font-weight:bold;color:#111827;">
+                        ${nuevaPassword}
+                      </p>
+                    </div>
+
+                    <p style="font-size:14px;color:#6b7280;">
+                      Por seguridad, cambia tu contraseña después de iniciar sesión.
+                    </p>
+
+                    <div style="text-align:center;margin-top:30px;">
+                      <a href="https://api.joseolvera.com"
+                         style="display:inline-block;background:#111827;color:#ffffff;
+                                padding:12px 25px;border-radius:6px;
+                                text-decoration:none;font-size:15px;">
+                        Iniciar sesión
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="background:#f9fafb;padding:20px;text-align:center;
+                             font-size:12px;color:#9ca3af;">
+                    © 2026 Películas App — Sistema Administrativo<br/>
+                    Este es un mensaje automático, no respondas a este correo.
+                  </td>
+                </tr>
+
+              </table>
+
+            </td>
+          </tr>
+        </table>
+      </div>
+      `;
+
       await enviarCorreo(
         correo,
-        'Recuperación de contraseña',
-        `Tu nueva contraseña es: ${nuevaPassword}`
+        '🔐 Recuperación de contraseña - Películas App',
+        html
       );
+
     } catch (errorCorreo) {
       console.error("ERROR CORREO RECUPERAR:", errorCorreo);
     }
 
-    res.json({ message: 'Nueva contraseña generada correctamente' });
+    res.json({ message: 'Nueva contraseña enviada correctamente' });
 
   } catch (error) {
     console.error("ERROR RECUPERAR:", error);

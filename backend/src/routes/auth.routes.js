@@ -8,7 +8,7 @@ const rolMiddleware = require('../middleware/rol.middleware');
  * @swagger
  * tags:
  *   name: Auth
- *   description: Endpoints de autenticación
+ *   description: Endpoints de autenticación y gestión de cuentas
  */
 
 
@@ -16,9 +16,11 @@ const rolMiddleware = require('../middleware/rol.middleware');
  * @swagger
  * /api/auth/registro:
  *   post:
- *     summary: Registrar nuevo cliente
+ *     summary: Registrar usuario (Solo ADMIN)
  *     tags: [Auth]
- *     description: Registra un cliente y envía contraseña automática por correo
+ *     description: Permite al administrador crear un nuevo usuario (Administrador o Cliente). Se envía contraseña temporal por correo.
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -29,6 +31,7 @@ const rolMiddleware = require('../middleware/rol.middleware');
  *               - nombre
  *               - apellido_paterno
  *               - correo
+ *               - rol_id
  *             properties:
  *               nombre:
  *                 type: string
@@ -42,22 +45,32 @@ const rolMiddleware = require('../middleware/rol.middleware');
  *               correo:
  *                 type: string
  *                 example: jose@gmail.com
+ *               rol_id:
+ *                 type: integer
+ *                 example: 2
  *     responses:
  *       200:
  *         description: Usuario registrado correctamente
  *       400:
- *         description: El correo ya está registrado
+ *         description: Rol inválido o correo ya registrado
+ *       401:
+ *         description: No autorizado
  */
-router.post('/registro', authMiddleware, rolMiddleware(1), authController.registro);
+router.post(
+  '/registro',
+  authMiddleware,
+  rolMiddleware(1),
+  authController.registro
+);
 
 
 /**
  * @swagger
  * /api/auth/login:
  *   post:
- *     summary: Iniciar sesión
+ *     summary: Iniciar sesión (Solo ADMIN para web)
  *     tags: [Auth]
- *     description: Permite iniciar sesión y devuelve un JWT
+ *     description: Autentica al usuario y devuelve un JWT válido por 8 horas. Solo administradores pueden iniciar sesión en la web.
  *     requestBody:
  *       required: true
  *       content:
@@ -78,7 +91,9 @@ router.post('/registro', authMiddleware, rolMiddleware(1), authController.regist
  *       200:
  *         description: Login correcto
  *       400:
- *         description: Credenciales incorrectas
+ *         description: Usuario no encontrado o contraseña incorrecta
+ *       403:
+ *         description: Acceso permitido solo para administradores
  */
 router.post('/login', authController.login);
 
@@ -89,7 +104,7 @@ router.post('/login', authController.login);
  *   post:
  *     summary: Recuperar contraseña
  *     tags: [Auth]
- *     description: Genera una nueva contraseña y la envía al correo del usuario
+ *     description: Genera una nueva contraseña temporal y la envía por correo electrónico en formato HTML.
  *     requestBody:
  *       required: true
  *       content:
@@ -101,7 +116,7 @@ router.post('/login', authController.login);
  *             properties:
  *               correo:
  *                 type: string
- *                 example: jose@gmail.com
+ *                 example: usuario@gmail.com
  *     responses:
  *       200:
  *         description: Nueva contraseña enviada al correo
