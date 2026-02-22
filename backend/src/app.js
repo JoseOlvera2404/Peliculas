@@ -25,6 +25,10 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 const PORT = process.env.PORT || 3000;
 
+app.get('/', (req, res) => {
+  res.status(200).send('API funcionando correctamente');
+});
+
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en puerto ${PORT}`);
 });
