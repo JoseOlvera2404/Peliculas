@@ -70,3 +70,60 @@ exports.eliminarUsuario = async (req, res) => {
     res.status(500).json({ message: "Error al eliminar usuario" });
   }
 };
+
+// =============================
+// EDITAR USUARIO / CLIENTE
+// =============================
+exports.editarUsuario = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      nombre,
+      apellido_paterno,
+      apellido_materno,
+      correo,
+      rol_id
+    } = req.body;
+
+    // Verificar que exista
+    const [existe] = await db.query(
+      "SELECT id FROM usuarios WHERE id = ?",
+      [id]
+    );
+
+    if (existe.length === 0) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    // Validar rol si viene (solo 1 o 2)
+    if (rol_id && ![1, 2].includes(Number(rol_id))) {
+      return res.status(400).json({ message: "Rol inválido" });
+    }
+
+    await db.query(
+      `
+      UPDATE usuarios
+      SET nombre = ?,
+          apellido_paterno = ?,
+          apellido_materno = ?,
+          correo = ?,
+          rol_id = COALESCE(?, rol_id)
+      WHERE id = ?
+      `,
+      [
+        nombre,
+        apellido_paterno,
+        apellido_materno,
+        correo,
+        rol_id || null,
+        id
+      ]
+    );
+
+    res.json({ message: "Usuario actualizado correctamente" });
+
+  } catch (error) {
+    console.error("ERROR EDITAR USUARIO:", error);
+    res.status(500).json({ message: "Error al actualizar usuario" });
+  }
+};

@@ -6,6 +6,8 @@ const API = process.env.NEXT_PUBLIC_API_URL;
 
 export default function ClientesAdmin() {
   const [clientes, setClientes] = useState([]);
+  const [editandoId, setEditandoId] = useState<number | null>(null);
+
   const [form, setForm] = useState({
     nombre: "",
     apellido_paterno: "",
@@ -31,26 +33,48 @@ export default function ClientesAdmin() {
     cargarClientes();
   }, []);
 
-  const crearCliente = async (e: any) => {
-    e.preventDefault();
-
-    await fetch(`${API}/api/auth/registro`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({
-        ...form,
-        rol_id: 2 // FORZAMOS CLIENTE
-      })
-    });
-
+  const limpiarForm = () => {
     setForm({
       nombre: "",
       apellido_paterno: "",
       apellido_materno: "",
       correo: ""
     });
+    setEditandoId(null);
+  };
 
+  const guardar = async (e: any) => {
+    e.preventDefault();
+
+    if (editandoId) {
+      await fetch(`${API}/api/usuarios/${editandoId}`, {
+        method: "PUT",
+        headers,
+        body: JSON.stringify(form)
+      });
+    } else {
+      await fetch(`${API}/api/auth/registro`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          ...form,
+          rol_id: 2
+        })
+      });
+    }
+
+    limpiarForm();
     cargarClientes();
+  };
+
+  const editar = (cliente: any) => {
+    setForm({
+      nombre: cliente.nombre,
+      apellido_paterno: cliente.apellido_paterno,
+      apellido_materno: cliente.apellido_materno || "",
+      correo: cliente.correo
+    });
+    setEditandoId(cliente.id);
   };
 
   const cambiarEstado = async (id: number) => {
@@ -58,7 +82,6 @@ export default function ClientesAdmin() {
       method: "PATCH",
       headers
     });
-
     cargarClientes();
   };
 
@@ -67,7 +90,6 @@ export default function ClientesAdmin() {
       method: "DELETE",
       headers
     });
-
     cargarClientes();
   };
 
@@ -75,17 +97,14 @@ export default function ClientesAdmin() {
     <div>
       <h1 className="text-2xl font-bold mb-6">Gestión de Clientes</h1>
 
-      {/* FORMULARIO */}
       <form
-        onSubmit={crearCliente}
+        onSubmit={guardar}
         className="bg-gray-100 p-6 rounded-xl shadow mb-10 grid grid-cols-2 gap-4"
       >
         <input
           placeholder="Nombre"
           value={form.nombre}
-          onChange={(e) =>
-            setForm({ ...form, nombre: e.target.value })
-          }
+          onChange={(e) => setForm({ ...form, nombre: e.target.value })}
           className="p-3 rounded border"
           required
         />
@@ -113,19 +132,26 @@ export default function ClientesAdmin() {
           type="email"
           placeholder="Correo"
           value={form.correo}
-          onChange={(e) =>
-            setForm({ ...form, correo: e.target.value })
-          }
+          onChange={(e) => setForm({ ...form, correo: e.target.value })}
           className="p-3 rounded border col-span-2"
           required
         />
 
         <button className="col-span-2 bg-gray-900 text-white p-3 rounded-lg hover:bg-gray-800 transition">
-          Crear Cliente
+          {editandoId ? "Actualizar Cliente" : "Crear Cliente"}
         </button>
+
+        {editandoId && (
+          <button
+            type="button"
+            onClick={limpiarForm}
+            className="col-span-2 bg-gray-500 text-white p-3 rounded-lg"
+          >
+            Cancelar edición
+          </button>
+        )}
       </form>
 
-      {/* TABLA */}
       <div className="overflow-x-auto">
         <table className="w-full bg-white shadow rounded-xl overflow-hidden">
           <thead className="bg-gray-900 text-white">
@@ -143,9 +169,7 @@ export default function ClientesAdmin() {
                 <td className="p-3">
                   {c.nombre} {c.apellido_paterno}
                 </td>
-
                 <td className="p-3">{c.correo}</td>
-
                 <td className="p-3">
                   {c.activo ? (
                     <span className="text-green-600 font-semibold">
@@ -157,8 +181,14 @@ export default function ClientesAdmin() {
                     </span>
                   )}
                 </td>
-
                 <td className="p-3 text-center flex gap-2 justify-center">
+                  <button
+                    onClick={() => editar(c)}
+                    className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                  >
+                    Editar
+                  </button>
+
                   <button
                     onClick={() => cambiarEstado(c.id)}
                     className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
