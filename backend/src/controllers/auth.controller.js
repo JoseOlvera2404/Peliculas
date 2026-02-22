@@ -134,9 +134,9 @@ exports.registro = async (req, res) => {
 
 
 // =============================
-// LOGIN SOLO ADMIN (WEB)
+// LOGIN ADMIN (WEB)
 // =============================
-exports.login = async (req, res) => {
+exports.loginAdmin = async (req, res) => {
   try {
     const { correo, password } = req.body;
 
@@ -157,7 +157,7 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: 'Contraseña incorrecta' });
     }
 
-    // 🚨 BLOQUEAR SI NO ES ADMIN
+    // 🔒 SOLO ADMIN
     if (usuario.rol_id !== 1) {
       return res.status(403).json({
         message: 'Acceso permitido solo para administradores'
@@ -184,11 +184,67 @@ exports.login = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("ERROR LOGIN:", error);
+    console.error("ERROR LOGIN ADMIN:", error);
     res.status(500).json({ message: 'Error en el login' });
   }
 };
 
+
+// =============================
+// LOGIN CLIENTE (APP)
+// =============================
+exports.loginCliente = async (req, res) => {
+  try {
+    const { correo, password } = req.body;
+
+    const [usuarios] = await db.query(
+      'SELECT * FROM usuarios WHERE correo = ? AND activo = TRUE',
+      [correo]
+    );
+
+    if (usuarios.length === 0) {
+      return res.status(400).json({ message: 'Usuario no encontrado' });
+    }
+
+    const usuario = usuarios[0];
+
+    const passwordValido = await bcrypt.compare(password, usuario.password);
+
+    if (!passwordValido) {
+      return res.status(400).json({ message: 'Contraseña incorrecta' });
+    }
+
+    // 🔒 SOLO CLIENTE
+    if (usuario.rol_id !== 2) {
+      return res.status(403).json({
+        message: 'Acceso permitido solo para clientes'
+      });
+    }
+
+    const token = jwt.sign(
+      {
+        id: usuario.id,
+        rol: usuario.rol_id
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '8h' }
+    );
+
+    res.json({
+      message: 'Login correcto',
+      token,
+      usuario: {
+        id: usuario.id,
+        nombre: usuario.nombre,
+        rol: usuario.rol_id
+      }
+    });
+
+  } catch (error) {
+    console.error("ERROR LOGIN CLIENTE:", error);
+    res.status(500).json({ message: 'Error en el login' });
+  }
+};
 
 // =============================
 // RECUPERAR CONTRASEÑA

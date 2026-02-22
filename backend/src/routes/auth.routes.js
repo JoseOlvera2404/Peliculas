@@ -95,8 +95,10 @@ router.post(
  *       403:
  *         description: Acceso permitido solo para administradores
  */
-router.post('/login', authController.login);
+router.post('/login-admin', authController.loginAdmin);
 
+
+router.post('/login-cliente', authController.loginCliente);
 
 /**
  * @swagger
